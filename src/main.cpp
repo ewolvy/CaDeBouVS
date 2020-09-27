@@ -1,5 +1,9 @@
 #include "main.h"
 
+Encoder *myEncoderLeft, *myEncoderRight;
+PinesMotores motor_izq;
+PinesMotores motor_dch;
+
 void setup() {
   Serial.begin(115200);
   /*
@@ -14,8 +18,21 @@ void setup() {
 
   /*
   Inicialización de la pantalla
+
   setup_tft();
   */
+
+  /*
+  Inicialización de los encoders
+
+  setupEncoders();
+  */
+
+  /*
+  Inicialización de los motores
+  */
+
+  setupMotores();
 }
 
 void loop() {
@@ -35,5 +52,70 @@ void loop() {
   show_voltage();
   */
 
+  /*
+  Pruebas de encoders
+
+  Serial.print("Encoder izquierdo: ");
+  Serial.println(myEncoderLeft->getPulses());
+  Serial.print("Encoder derecho:   ");
+  Serial.println(myEncoderRight->getPulses());
+  */
+
+  /*
+  Pruebas de motores
+
+  */
+  Serial.println("Motor derecho al 50%");
+  mover_motor(motor_dch, 128);
+
+  Serial.println("Motor izquierdo al 50%");
+  mover_motor(motor_izq, 128);
+  delay(2000);
+  motor_full_stop(motor_izq, motor_dch);
+
   delay(500);
+}
+
+void setupEncoders(){
+  myEncoderLeft = new Encoder(LEFT_ENCODER_A_PIN, LEFT_ENCODER_B_PIN, &doEncoderLeft);
+  myEncoderRight = new Encoder(RIGHT_ENCODER_A_PIN, RIGHT_ENCODER_B_PIN, &doEncoderRight);
+}
+
+void doEncoderLeft(){
+  myEncoderLeft->signalReceived();
+}
+
+void doEncoderRight(){
+  myEncoderRight->signalReceived();
+}
+
+void setupMotores(){
+  motor_dch.adelante = RIGHT_MOTOR_FWD_PIN;
+  motor_dch.atras = RIGHT_MOTOR_REV_PIN;
+  motor_dch.canal_adelante = RIGHT_MOTOR_FWD_CH;
+  motor_dch.canal_atras = RIGHT_MOTOR_REV_CH;
+
+  motor_izq.adelante = LEFT_MOTOR_FWD_PIN;
+  motor_izq.atras = LEFT_MOTOR_REV_PIN;
+  motor_izq.canal_adelante = LEFT_MOTOR_FWD_CH;
+  motor_izq.canal_atras = LEFT_MOTOR_REV_CH;
+
+  pinMode(motor_dch.adelante, OUTPUT);
+  pinMode(motor_dch.atras, OUTPUT);
+  pinMode(motor_izq.adelante, OUTPUT);
+  pinMode(motor_izq.atras, OUTPUT);
+
+  digitalWrite(motor_dch.adelante, 0);
+  digitalWrite(motor_dch.atras, 0);
+  digitalWrite(motor_izq.adelante, 0);
+  digitalWrite(motor_izq.atras, 0);
+  
+  ledcSetup(motor_izq.canal_adelante, 500, 8);
+  ledcAttachPin(motor_izq.adelante, motor_izq.canal_adelante);
+  ledcSetup(motor_izq.canal_atras, 500, 8);
+  ledcAttachPin(motor_izq.atras, motor_izq.canal_atras);
+  ledcSetup(motor_dch.canal_adelante, 500, 8);
+  ledcAttachPin(motor_dch.adelante, motor_dch.canal_adelante);
+  ledcSetup(motor_dch.canal_atras, 500, 8);
+  ledcAttachPin(motor_dch.atras, motor_dch.canal_atras);
 }

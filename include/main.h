@@ -6,5 +6,12 @@
 #include <Wire.h>
 #include "setup.h"
 #include "tft.h"
+#include "encoder.h"
+#include "motores.h"
+
+void setupEncoders();
+void setupMotores();
+void doEncoderLeft();
+void doEncoderRight();
 
 #endif
